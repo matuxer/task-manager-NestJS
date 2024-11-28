@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Task } from './tasks/task.model';
+import { TaskModule } from './tasks/task.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { Task } from './tasks/task.model';
       synchronize: true,
     }),
 
-    SequelizeModule.forFeature([Task]),
+    TaskModule,
   ],
 })
 export class AppModule {}
