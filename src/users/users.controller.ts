@@ -98,12 +98,22 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string): Promise<void> {
-    const deleted = await this.userService.deleteUser(id);
-    if (!deleted) {
+  async deleteUser(@Param('id') id: string): Promise<{ message: string }> {
+    try {
+      const deleted = await this.userService.deleteUser(id);
+      if (!deleted) {
+        throw new HttpException(
+          'Usuario no encontrado o ya eliminado',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return { message: `Usuario con ID ${id} eliminado correctamente` };
+    } catch (error) {
+      console.error('Error al intentar eliminar el usuario:', error.message);
       throw new HttpException(
-        'Tarea no encontrada o ya eliminada',
-        HttpStatus.NOT_FOUND,
+        'Error interno al eliminar el usuario',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
