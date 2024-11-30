@@ -97,14 +97,18 @@ export class TaskController {
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<Task> {
-    const task = await this.taskService.updateTask(id, updateTaskDto);
-    if (!task) {
+    try {
+      const task = await this.taskService.updateTask(id, updateTaskDto);
+      return task;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
       throw new HttpException(
-        'No se pudo actualizar la tarea',
-        HttpStatus.NOT_FOUND,
+        'Error al actualizar la tarea',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return task;
   }
 
   @Delete(':id')

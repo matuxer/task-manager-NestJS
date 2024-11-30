@@ -105,14 +105,23 @@ export class TaskService {
   //  }
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    const task = await this.getTaskById(id);
+    try {
+      const task = await this.getTaskById(id);
 
-    task.title = updateTaskDto.title ?? task.title;
-    task.description = updateTaskDto.description ?? task.description;
-    task.completed = updateTaskDto.completed ?? task.completed;
+      if (!task) {
+        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
+      }
 
-    await task.save();
-    return task;
+      task.title = updateTaskDto.title ?? task.title;
+      task.description = updateTaskDto.description ?? task.description;
+      task.completed = updateTaskDto.completed ?? task.completed;
+
+      await task.save();
+      return task;
+    } catch (error) {
+      console.error('Error al actualizar la tarea:', error.message);
+      throw new InternalServerErrorException('Error al actualizar la tarea');
+    }
   }
 
   async deleteTask(id: string): Promise<boolean> {
