@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { PaginationResponse } from 'src/types/pagination-response.type';
+import { Task } from 'src/tasks/tasks.model';
 
 @Injectable()
 export class UsersService {
@@ -79,7 +80,15 @@ export class UsersService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const user = await this.userModel.findOne({ where: { id } });
+    const user = await this.userModel.findOne({
+      where: { id },
+      include: [
+        {
+          model: Task,
+          required: false,
+        },
+      ],
+    });
     if (!user) {
       throw new Error(`Usuario con ID ${id} no encontrado`);
     }
