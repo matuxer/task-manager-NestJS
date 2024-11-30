@@ -125,12 +125,18 @@ export class TaskService {
   }
 
   async deleteTask(id: string): Promise<boolean> {
-    const task = await this.taskModel.findOne({ where: { id } });
-    if (task) {
+    try {
+      const task = await this.taskModel.findOne({ where: { id } });
+
+      if (!task) {
+        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
+      }
+
       await task.destroy();
       return true;
+    } catch (error) {
+      console.error('Error al eliminar la tarea:', error.message);
+      throw new InternalServerErrorException('No se pudo eliminar la tarea');
     }
-
-    return false;
   }
 }

@@ -112,12 +112,25 @@ export class TaskController {
   }
 
   @Delete(':id')
-  async deleteTask(@Param('id') id: string): Promise<void> {
-    const deleted = await this.taskService.deleteTask(id);
-    if (!deleted) {
+  async deleteTask(@Param('id') id: string): Promise<{ message: string }> {
+    try {
+      const deleted = await this.taskService.deleteTask(id);
+      if (!deleted) {
+        throw new HttpException(
+          'Tarea no encontrado o ya eliminado',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return { message: `Tarea con ID ${id} eliminada correctamente` };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+
       throw new HttpException(
-        'Tarea no encontrada o ya eliminada',
-        HttpStatus.NOT_FOUND,
+        'Error al eliminar la tarea',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
