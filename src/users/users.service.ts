@@ -44,8 +44,15 @@ export class UsersService {
     }
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return this.userModel.findAll();
+  async getAllUsers(page: number = 1, limit: number = 10): Promise<User[]> {
+    try {
+      return this.userModel.findAll({
+        limit,
+        offset: (page - 1) * limit,
+      });
+    } catch (error) {
+      throw new Error('Error al obtener los usuarios: ' + error.message);
+    }
   }
 
   async getUserById(id: string): Promise<User> {

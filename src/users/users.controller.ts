@@ -10,6 +10,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.model';
@@ -45,8 +46,19 @@ export class UsersController {
   }
 
   @Get()
-  async getAllUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
+  async getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<User[]> {
+    try {
+      return this.userService.getAllUsers(page, limit);
+    } catch (error) {
+      console.error('Error al obtener los usuarios', error.message);
+      throw new HttpException(
+        'Error al obtener los usuarios',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')
