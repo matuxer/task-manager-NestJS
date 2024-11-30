@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { User } from 'src/users/users.model';
 
 @Table({
   tableName: 'tasks',
@@ -15,6 +23,9 @@ export class Task extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    validate: {
+      len: [3, 100],
+    },
   })
   title: string;
 
@@ -29,4 +40,14 @@ export class Task extends Model {
     defaultValue: false,
   })
   completed: boolean;
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId: string;
+
+  @BelongsTo(() => User)
+  user: User;
 }

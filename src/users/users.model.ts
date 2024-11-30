@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Task } from 'src/tasks/tasks.model';
 
 @Table({
   tableName: 'users',
@@ -15,6 +16,9 @@ export class User extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    validate: {
+      len: [3, 50],
+    },
   })
   name: string;
 
@@ -22,6 +26,9 @@ export class User extends Model {
     type: DataType.STRING,
     allowNull: false,
     unique: true,
+    validate: {
+      isEmail: true,
+    },
   })
   email: string;
 
@@ -30,4 +37,13 @@ export class User extends Model {
     allowNull: false,
   })
   password: string;
+
+  @HasMany(() => Task)
+  tasks: Task[];
+
+  toJSON() {
+    const values = { ...this.get() };
+    delete values.password;
+    return values;
+  }
 }
