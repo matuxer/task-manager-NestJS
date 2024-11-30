@@ -41,6 +41,7 @@ export class TaskService {
           {
             model: User,
             required: true,
+            attributes: { exclude: ['password'] },
           },
         ],
       });
@@ -74,6 +75,7 @@ export class TaskService {
           {
             model: User,
             required: true,
+            attributes: { exclude: ['password'] },
           },
         ],
       });
