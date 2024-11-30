@@ -8,6 +8,7 @@ import { User } from './users.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { PaginationResponse } from 'src/types/pagination-response.type';
 
 @Injectable()
 export class UsersService {
@@ -44,19 +45,43 @@ export class UsersService {
     }
   }
 
-  async getAllUsers(page: number = 1, limit: number = 10): Promise<User[]> {
+  async getAllUsers(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginationResponse<User>> {
     try {
-      return this.userModel.findAll({
+      //return this.userModel.findAll({
+      //  limit,
+      //  offset: (page - 1) * limit,
+      //});
+
+      const { count, rows } = await this.userModel.findAndCountAll({
         limit,
         offset: (page - 1) * limit,
       });
+
+      const next =
+        page * limit < count ? `/users?page=${page + 1}&limit=${limit}` : null;
+      const previous =
+        page > 1 ? `/users?page=${page - 1}&limit=${limit}` : null;
+
+      return {
+        count,
+        next,
+        previous,
+        results: rows,
+      };
     } catch (error) {
       throw new Error('Error al obtener los usuarios: ' + error.message);
     }
   }
 
   async getUserById(id: string): Promise<User> {
-    return this.userModel.findOne({ where: { id } });
+    const user = await this.userModel.findOne({ where: { id } });
+    if (!user) {
+      throw new Error(`Usuario con ID ${id} no encontrado`);
+    }
+    return user;
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {

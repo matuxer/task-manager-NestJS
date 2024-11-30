@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationResponse } from 'src/types/pagination-response.type';
 
 @Controller('users')
 export class UsersController {
@@ -24,7 +25,7 @@ export class UsersController {
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     try {
-      return this.userService.createUser(createUserDto);
+      return await this.userService.createUser(createUserDto);
     } catch (error) {
       if (error instanceof ConflictException) {
         throw new HttpException(error.message, HttpStatus.CONFLICT);
@@ -49,9 +50,16 @@ export class UsersController {
   async getAllUsers(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ): Promise<User[]> {
+  ): Promise<PaginationResponse<User>> {
+    if (isNaN(limit) || isNaN(limit) || page <= 0 || limit <= 0) {
+      throw new HttpException(
+        'Parámetros de paginación inválidos',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
-      return this.userService.getAllUsers(page, limit);
+      return await this.userService.getAllUsers(page, limit);
     } catch (error) {
       console.error('Error al obtener los usuarios', error.message);
       throw new HttpException(
@@ -63,7 +71,15 @@ export class UsersController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<User> {
-    return this.userService.getUserById(id);
+    try {
+      return await this.userService.getUserById(id);
+    } catch (error) {
+      console.error('Error al obtener el usuario', error.message);
+      throw new HttpException(
+        `Usuario con ID ${id} no encontrado`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   @Put(':id')
