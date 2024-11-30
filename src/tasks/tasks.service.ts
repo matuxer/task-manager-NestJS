@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './tasks.model';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -63,11 +67,24 @@ export class TaskService {
   //  }
 
   async getTaskById(id: string): Promise<Task> {
-    const task = await this.taskModel.findOne({ where: { id } });
-    if (!task) {
-      throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
+    try {
+      const task = await this.taskModel.findOne({
+        where: { id },
+        include: [
+          {
+            model: User,
+            required: true,
+          },
+        ],
+      });
+      if (!task) {
+        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
+      }
+      return task;
+    } catch (error) {
+      console.error('Error al obtener la tarea:', error.message);
+      throw new InternalServerErrorException('Error al obtener la tarea');
     }
-    return task;
   }
 
   //  async updateTask(

@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -67,7 +68,18 @@ export class TaskController {
 
   @Get(':id')
   async getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.taskService.getTaskById(id);
+    try {
+      return await this.taskService.getTaskById(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+
+      throw new HttpException(
+        'Error al obtener la tarea',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   //  @Put(':id')
