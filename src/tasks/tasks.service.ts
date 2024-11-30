@@ -13,8 +13,14 @@ export class TaskService {
   //  }
 
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const { title, description } = createTaskDto;
-    return this.taskModel.create({ title, description });
+    const { title, description, userId } = createTaskDto;
+    try {
+      const task = this.taskModel.create({ title, description, userId });
+      return task;
+    } catch (error) {
+      console.error('Error al crear la tarea:', error.message);
+      throw new Error('Error al crear la tarea');
+    }
   }
 
   async getAllTasks(): Promise<Task[]> {

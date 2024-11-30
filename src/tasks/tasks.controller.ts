@@ -29,7 +29,7 @@ export class TaskController {
   @Post()
   async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
     try {
-      return this.taskService.createTask(createTaskDto);
+      return await this.taskService.createTask(createTaskDto);
     } catch (error) {
       console.error('Error al crear la tarea', error.message);
 
