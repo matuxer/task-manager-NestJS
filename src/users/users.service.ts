@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -85,14 +87,28 @@ export class UsersService {
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.getUserById(id);
+    try {
+      const user = await this.getUserById(id);
 
-    user.name = updateUserDto.name ?? user.name;
-    user.email = updateUserDto.email ?? user.email;
-    user.password = updateUserDto.password ?? user.password;
+      if (!user) {
+        throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+      }
 
-    await user.save();
-    return user;
+      if (updateUserDto.password) {
+        user.password = await bcrypt.hash(updateUserDto.password, 10);
+      }
+
+      user.name = updateUserDto.name ?? user.name;
+      user.email = updateUserDto.email ?? user.email;
+
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new HttpException(
+        'Error al actualizar el usuario: ' + error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async deleteUser(id: string): Promise<boolean> {
