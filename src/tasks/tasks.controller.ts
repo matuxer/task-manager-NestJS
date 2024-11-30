@@ -8,11 +8,13 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TaskService } from './tasks.service';
 import { Task } from './tasks.model';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { PaginationResponse } from 'src/types/pagination-response.type';
 
 @Controller('tasks')
 export class TaskController {
@@ -41,8 +43,26 @@ export class TaskController {
   }
 
   @Get()
-  async getAllTasks(): Promise<Task[]> {
-    return this.taskService.getAllTasks();
+  async getAllTasks(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Task>> {
+    if (isNaN(limit) || isNaN(limit) || page <= 0 || limit <= 0) {
+      throw new HttpException(
+        'Parámetros de paginación inválidos',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      return await this.taskService.getAllTasks(page, limit);
+    } catch (error) {
+      console.error('Error al obtener la tareas', error.message);
+      throw new HttpException(
+        'Error al obtener las tareas',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')
