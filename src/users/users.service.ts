@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -11,12 +16,32 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { name, email, password } = createUserDto;
 
-    const existingUser = await this.userModel.findOne({ where: { email } });
-    if (existingUser) {
-      throw new Error('El mail ya esta en uso');
-    }
+    try {
+      const existingUser = await this.userModel.findOne({ where: { email } });
+      if (existingUser) {
+        throw new ConflictException('El mail ya esta en uso');
+      }
 
-    return this.userModel.create({ name, email, password });
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await this.userModel.create({
+        name,
+        email,
+        password: hashedPassword,
+      });
+
+      user.setDataValue('password', undefined);
+
+      return user;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      } else {
+        console.error('Error al crear el usuario:', error);
+        throw new InternalServerErrorException(
+          'Error al procesar la solicitud. Intentelo de nuevo más tarde.',
+        );
+      }
+    }
   }
 
   async getAllUsers(): Promise<User[]> {

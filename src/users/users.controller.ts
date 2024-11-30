@@ -1,10 +1,12 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   Post,
   Put,
@@ -23,8 +25,18 @@ export class UsersController {
     try {
       return this.userService.createUser(createUserDto);
     } catch (error) {
-      console.error('Error al crear el usuario', error.message);
+      if (error instanceof ConflictException) {
+        throw new HttpException(error.message, HttpStatus.CONFLICT);
+      }
 
+      if (error instanceof InternalServerErrorException) {
+        throw new HttpException(
+          'Error interno en el servidor',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      console.error('Error al crear el usuario', error.message);
       throw new HttpException(
         'Error al crear el usuario',
         HttpStatus.BAD_REQUEST,
