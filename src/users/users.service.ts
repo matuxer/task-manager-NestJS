@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './users.model';
@@ -134,5 +135,16 @@ export class UsersService {
         'Error al intentar eliminar al usuario: ' + error.message,
       );
     }
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(
+        `No se encontró un usuario con el email: ${email}`,
+      );
+    }
+
+    return user;
   }
 }
