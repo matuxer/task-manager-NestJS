@@ -2,12 +2,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UsersService } from 'src/users/users.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { AuthResponse } from 'src/types/authentication-response.type';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -23,7 +26,7 @@ export class AuthService {
     return result;
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<any> {
+  async login(loginUserDto: LoginUserDto): Promise<AuthResponse<User>> {
     const { email, password } = loginUserDto;
 
     const user = await this.validateUser(email, password);
@@ -32,5 +35,18 @@ export class AuthService {
       message: 'Inicio de sesión exitoso',
       user,
     };
+  }
+
+  async register(createUserDto: CreateUserDto): Promise<AuthResponse<User>> {
+    try {
+      const user = await this.usersService.createUser(createUserDto);
+
+      return {
+        message: 'Registro de usuario exitoso',
+        user,
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
