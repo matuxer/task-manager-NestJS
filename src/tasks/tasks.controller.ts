@@ -21,26 +21,9 @@ import { PaginationResponse } from 'src/types/pagination-response.type';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  //  @Post()
-  //  async createTask(
-  //    @Body('title') title: string,
-  //    @Body('description') description: string,
-  //  ): Promise<Task> {
-  //    return this.taskService.createTask(title, description);
-  //  }
-
   @Post()
   async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    try {
-      return await this.taskService.createTask(createTaskDto);
-    } catch (error) {
-      console.error('Error al crear la tarea', error.message);
-
-      throw new HttpException(
-        'Error al crear la tarea',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    return await this.taskService.createTask(createTaskDto);
   }
 
   @Get()

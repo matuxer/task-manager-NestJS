@@ -14,19 +14,11 @@ import { PaginationResponse } from 'src/types/pagination-response.type';
 export class TaskService {
   constructor(@InjectModel(Task) private taskModel: typeof Task) {}
 
-  //  async createTask(title: string, description: string): Promise<Task> {
-  //    return this.taskModel.create({ title, description });
-  //  }
-
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     const { title, description, userId } = createTaskDto;
-    try {
-      const task = this.taskModel.create({ title, description, userId });
-      return task;
-    } catch (error) {
-      console.error('Error al crear la tarea:', error.message);
-      throw new Error('Error al crear la tarea');
-    }
+
+    const task = this.taskModel.create({ title, description, userId });
+    return task;
   }
 
   async getAllTasks(
