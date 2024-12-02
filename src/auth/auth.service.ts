@@ -38,15 +38,11 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto): Promise<AuthResponse<User>> {
-    try {
-      const user = await this.usersService.createUser(createUserDto);
+    const user = await this.usersService.createUser(createUserDto);
 
-      return {
-        message: 'Registro de usuario exitoso',
-        user,
-      };
-    } catch (error) {
-      throw new Error(error);
-    }
+    return {
+      message: 'Registro de usuario exitoso',
+      user,
+    };
   }
 }
