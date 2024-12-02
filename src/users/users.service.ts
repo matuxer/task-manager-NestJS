@@ -41,6 +41,13 @@ export class UsersService {
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginationResponse<User>> {
+    if (isNaN(limit) || isNaN(limit) || page <= 0 || limit <= 0) {
+      throw new HttpException(
+        'Parámetros de paginación inválidos',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const { count, rows } = await this.userModel.findAndCountAll({
       limit,
       offset: (page - 1) * limit,
