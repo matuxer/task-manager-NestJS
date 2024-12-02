@@ -39,33 +39,12 @@ export class TaskController {
     return await this.taskService.getTaskById(id);
   }
 
-  //  @Put(':id')
-  //  async updateTask(
-  //    @Param('id') id: string,
-  //    @Body('title') title: string,
-  //    @Body('description') description: string,
-  //    @Body('completed') completed: boolean,
-  //  ): Promise<Task> {
-  //    return this.taskService.updateTask(id, title, description, completed);
-  //  }
-
   @Put(':id')
   async updateTask(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<Task> {
-    try {
-      const task = await this.taskService.updateTask(id, updateTaskDto);
-      return task;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-      }
-      throw new HttpException(
-        'Error al actualizar la tarea',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.taskService.updateTask(id, updateTaskDto);
   }
 
   @Delete(':id')

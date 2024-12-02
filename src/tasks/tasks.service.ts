@@ -76,41 +76,28 @@ export class TaskService {
     return task;
   }
 
-  //  async updateTask(
-  //    id: string,
-  //    title: string,
-  //    description: string,
-  //    completed: boolean,
-  //  ): Promise<Task> {
-  //    const task = await this.taskModel.findOne({ where: { id } });
-  //    if (task) {
-  //      task.title = title;
-  //      task.description = description;
-  //      task.completed = completed;
-  //      await task.save();
-  //      return task;
-  //    }
-  //    return null;
-  //  }
-
   async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    try {
-      const task = await this.getTaskById(id);
+    const task = await this.taskModel.findOne({
+      where: { id },
+      include: [
+        {
+          model: User,
+          required: true,
+          attributes: { exclude: ['password', 'id', 'createdAt', 'updatedAt'] },
+        },
+      ],
+    });
 
-      if (!task) {
-        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
-      }
-
-      task.title = updateTaskDto.title ?? task.title;
-      task.description = updateTaskDto.description ?? task.description;
-      task.completed = updateTaskDto.completed ?? task.completed;
-
-      await task.save();
-      return task;
-    } catch (error) {
-      console.error('Error al actualizar la tarea:', error.message);
-      throw new InternalServerErrorException('Error al actualizar la tarea');
+    if (!task) {
+      throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
     }
+
+    task.title = updateTaskDto.title ?? task.title;
+    task.description = updateTaskDto.description ?? task.description;
+    task.completed = updateTaskDto.completed ?? task.completed;
+
+    await task.save();
+    return task;
   }
 
   async deleteTask(id: string): Promise<boolean> {
