@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -25,39 +27,36 @@ export class TaskService {
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginationResponse<Task>> {
-    try {
-      const { count, rows } = await this.taskModel.findAndCountAll({
-        limit,
-        offset: (page - 1) * limit,
-        include: [
-          {
-            model: User,
-            required: true,
-            attributes: { exclude: ['password'] },
-          },
-        ],
-      });
-
-      const next =
-        page * limit < count ? `/tasks?page=${page + 1}&limit=${limit}` : null;
-      const previous =
-        page > 1 ? `/tasks?page=${page - 1}&limit=${limit}` : null;
-
-      return {
-        count,
-        next,
-        previous,
-        results: rows,
-      };
-    } catch (error) {
-      console.error('Error al obtener las tareas:', error.message);
-      throw new Error('No se pudieron obtener la tareas');
+    if (isNaN(limit) || isNaN(limit) || page <= 0 || limit <= 0) {
+      throw new HttpException(
+        'Parámetros de paginación inválidos',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-  }
 
-  //  async getTaskById(id: string): Promise<Task> {
-  //    return this.taskModel.findOne({ where: { id } });
-  //  }
+    const { count, rows } = await this.taskModel.findAndCountAll({
+      limit,
+      offset: (page - 1) * limit,
+      include: [
+        {
+          model: User,
+          required: true,
+          attributes: { exclude: ['password'] },
+        },
+      ],
+    });
+
+    const next =
+      page * limit < count ? `/tasks?page=${page + 1}&limit=${limit}` : null;
+    const previous = page > 1 ? `/tasks?page=${page - 1}&limit=${limit}` : null;
+
+    return {
+      count,
+      next,
+      previous,
+      results: rows,
+    };
+  }
 
   async getTaskById(id: string): Promise<Task> {
     try {

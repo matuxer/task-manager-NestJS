@@ -31,22 +31,7 @@ export class TaskController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<PaginationResponse<Task>> {
-    if (isNaN(limit) || isNaN(limit) || page <= 0 || limit <= 0) {
-      throw new HttpException(
-        'Parámetros de paginación inválidos',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    try {
-      return await this.taskService.getAllTasks(page, limit);
-    } catch (error) {
-      console.error('Error al obtener la tareas', error.message);
-      throw new HttpException(
-        'Error al obtener las tareas',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.taskService.getAllTasks(page, limit);
   }
 
   @Get(':id')
