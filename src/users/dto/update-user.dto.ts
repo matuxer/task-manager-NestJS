@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
@@ -10,7 +9,8 @@ import {
 export class UpdateUserDto {
   @IsOptional({ message: 'El nombre es opcional' })
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
-  @IsNotEmpty({ message: 'El nombre no puede estar vacío' })
+  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+  @MaxLength(50, { message: 'El nombre no debe superar los 50 caracteres' })
   name?: string;
 
   @IsOptional({ message: 'El email es opcional' })
