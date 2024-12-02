@@ -38,7 +38,7 @@ export class User extends Model {
   })
   password: string;
 
-  @HasMany(() => Task)
+  @HasMany(() => Task, { onDelete: 'CASCADE' })
   tasks: Task[];
 
   toJSON() {
