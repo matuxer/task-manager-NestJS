@@ -43,14 +43,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    try {
-      const user = await this.userService.updateUser(id, updateUserDto);
-      return user;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-    }
+    return await this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
