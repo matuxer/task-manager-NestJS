@@ -35,15 +35,7 @@ export class UsersController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<User> {
-    try {
-      return await this.userService.getUserById(id);
-    } catch (error) {
-      console.error('Error al obtener el usuario', error.message);
-      throw new HttpException(
-        `Usuario con ID ${id} no encontrado`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    return await this.userService.getUserById(id);
   }
 
   @Put(':id')

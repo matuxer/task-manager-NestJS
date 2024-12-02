@@ -76,8 +76,9 @@ export class UsersService {
       ],
     });
     if (!user) {
-      throw new Error(`Usuario con ID ${id} no encontrado`);
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
+
     return user;
   }
 
