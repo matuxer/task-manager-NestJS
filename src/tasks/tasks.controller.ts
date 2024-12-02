@@ -36,18 +36,7 @@ export class TaskController {
 
   @Get(':id')
   async getTaskById(@Param('id') id: string): Promise<Task> {
-    try {
-      return await this.taskService.getTaskById(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-      }
-
-      throw new HttpException(
-        'Error al obtener la tarea',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.taskService.getTaskById(id);
   }
 
   //  @Put(':id')

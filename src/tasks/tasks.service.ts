@@ -59,25 +59,21 @@ export class TaskService {
   }
 
   async getTaskById(id: string): Promise<Task> {
-    try {
-      const task = await this.taskModel.findOne({
-        where: { id },
-        include: [
-          {
-            model: User,
-            required: true,
-            attributes: { exclude: ['password'] },
-          },
-        ],
-      });
-      if (!task) {
-        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
-      }
-      return task;
-    } catch (error) {
-      console.error('Error al obtener la tarea:', error.message);
-      throw new InternalServerErrorException('Error al obtener la tarea');
+    const task = await this.taskModel.findOne({
+      where: { id },
+      include: [
+        {
+          model: User,
+          required: true,
+          attributes: { exclude: ['password', 'id', 'createdAt', 'updatedAt'] },
+        },
+      ],
+    });
+    if (!task) {
+      throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
     }
+
+    return task;
   }
 
   //  async updateTask(
