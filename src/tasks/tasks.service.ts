@@ -2,7 +2,6 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -100,19 +99,14 @@ export class TaskService {
     return task;
   }
 
-  async deleteTask(id: string): Promise<boolean> {
-    try {
-      const task = await this.taskModel.findOne({ where: { id } });
+  async deleteTask(id: string): Promise<{ message: string }> {
+    const task = await this.taskModel.findOne({ where: { id } });
 
-      if (!task) {
-        throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
-      }
-
-      await task.destroy();
-      return true;
-    } catch (error) {
-      console.error('Error al eliminar la tarea:', error.message);
-      throw new InternalServerErrorException('No se pudo eliminar la tarea');
+    if (!task) {
+      throw new NotFoundException(`No se encontró la tarea con ID: ${id}`);
     }
+
+    await task.destroy();
+    return { message: `Tarea con ID ${id} eliminada correctamente` };
   }
 }
