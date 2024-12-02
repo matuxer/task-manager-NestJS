@@ -3,7 +3,6 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -21,63 +20,42 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { name, email, password } = createUserDto;
 
-    try {
-      const existingUser = await this.userModel.findOne({ where: { email } });
-      if (existingUser) {
-        throw new ConflictException('El mail ya esta en uso');
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await this.userModel.create({
-        name,
-        email,
-        password: hashedPassword,
-      });
-
-      user.setDataValue('password', undefined);
-
-      return user;
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        throw error;
-      } else {
-        console.error('Error al crear el usuario:', error);
-        throw new InternalServerErrorException(
-          'Error al procesar la solicitud. Intentelo de nuevo más tarde.',
-        );
-      }
+    const existingUser = await this.userModel.findOne({ where: { email } });
+    if (existingUser) {
+      throw new ConflictException('El mail ya esta en uso');
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await this.userModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    user.setDataValue('password', undefined);
+
+    return user;
   }
 
   async getAllUsers(
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginationResponse<User>> {
-    try {
-      //return this.userModel.findAll({
-      //  limit,
-      //  offset: (page - 1) * limit,
-      //});
+    const { count, rows } = await this.userModel.findAndCountAll({
+      limit,
+      offset: (page - 1) * limit,
+    });
 
-      const { count, rows } = await this.userModel.findAndCountAll({
-        limit,
-        offset: (page - 1) * limit,
-      });
+    const next =
+      page * limit < count ? `/users?page=${page + 1}&limit=${limit}` : null;
+    const previous = page > 1 ? `/users?page=${page - 1}&limit=${limit}` : null;
 
-      const next =
-        page * limit < count ? `/users?page=${page + 1}&limit=${limit}` : null;
-      const previous =
-        page > 1 ? `/users?page=${page - 1}&limit=${limit}` : null;
-
-      return {
-        count,
-        next,
-        previous,
-        results: rows,
-      };
-    } catch (error) {
-      throw new Error('Error al obtener los usuarios: ' + error.message);
-    }
+    return {
+      count,
+      next,
+      previous,
+      results: rows,
+    };
   }
 
   async getUserById(id: string): Promise<User> {
