@@ -100,20 +100,16 @@ export class UsersService {
     return user;
   }
 
-  async deleteUser(id: string): Promise<boolean> {
-    try {
-      const user = await this.userModel.findOne({ where: { id } });
-      if (!user) {
-        throw new Error('Usuario no econtrado');
-      }
-
-      await user.destroy();
-      return true;
-    } catch (error) {
-      throw new Error(
-        'Error al intentar eliminar al usuario: ' + error.message,
-      );
+  async deleteUser(id: string): Promise<{ message: string }> {
+    const user = await this.userModel.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
+
+    await user.destroy();
+    return {
+      message: `Usuario con ID ${id} eliminado correctamente`,
+    };
   }
 
   async findByEmail(email: string): Promise<User> {

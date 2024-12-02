@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   Put,
@@ -48,22 +46,6 @@ export class UsersController {
 
   @Delete(':id')
   async deleteUser(@Param('id') id: string): Promise<{ message: string }> {
-    try {
-      const deleted = await this.userService.deleteUser(id);
-      if (!deleted) {
-        throw new HttpException(
-          'Usuario no encontrado o ya eliminado',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return { message: `Usuario con ID ${id} eliminado correctamente` };
-    } catch (error) {
-      console.error('Error al intentar eliminar el usuario:', error.message);
-      throw new HttpException(
-        'Error interno al eliminar el usuario',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.userService.deleteUser(id);
   }
 }
