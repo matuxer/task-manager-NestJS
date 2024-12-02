@@ -41,7 +41,7 @@ export class TaskService {
         {
           model: User,
           required: true,
-          attributes: { exclude: ['password'] },
+          attributes: { exclude: ['password', 'id', 'createdAt', 'updatedAt'] },
         },
       ],
     });
