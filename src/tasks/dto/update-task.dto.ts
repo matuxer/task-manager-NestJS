@@ -3,7 +3,7 @@ import { IsBoolean, IsOptional, IsString, MinLength } from 'class-validator';
 export class UpdateTaskDto {
   @IsOptional({ message: 'El titulo es opcional' })
   @IsString({ message: 'El titulo debe ser una cadena de texto' })
-  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+  @MinLength(3, { message: 'El titulo debe tener al menos 3 caracteres' })
   title?: string;
 
   @IsOptional({ message: 'La descripción es opcional' })

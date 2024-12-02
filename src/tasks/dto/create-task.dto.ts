@@ -10,7 +10,7 @@ import {
 export class CreateTaskDto {
   @IsString({ message: 'El titulo debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'El titulo no puede estar vacío' })
-  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+  @MinLength(3, { message: 'El titulo debe tener al menos 3 caracteres' })
   title: string;
 
   @IsOptional({ message: 'La descripción es opcional' })
