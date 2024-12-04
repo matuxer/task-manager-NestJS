@@ -4,6 +4,9 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { TaskModule } from './tasks/task.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { seconds, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { CustomThrottlerGuard } from './custom-throttler.guard';
 
 @Module({
   imports: [
@@ -23,9 +26,23 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
     }),
 
+    ThrottlerModule.forRoot([
+      {
+        ttl: seconds(60),
+        limit: 20,
+      },
+    ]),
+
     TaskModule,
     UsersModule,
     AuthModule,
+  ],
+
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
