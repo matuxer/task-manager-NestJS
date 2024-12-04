@@ -14,7 +14,7 @@ import { Task } from './tasks.model';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PaginationResponse } from 'src/types/pagination-response.type';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('tasks')
 export class TaskController {

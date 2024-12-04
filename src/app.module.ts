@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { CustomThrottlerGuard } from './custom-throttler.guard';
+import { CustomThrottlerGuard } from './guards/custom-throttler.guard';
 
 @Module({
   imports: [
